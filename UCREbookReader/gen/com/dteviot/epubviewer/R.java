@@ -11,12 +11,12 @@ public final class R {
 		public static final int ic_launcher = 0x7f020011;
 	}
 	public static final class id {
-		public static final int bookmark_dialog_goto_button = 0x7f0b0022;
-		public static final int bookmark_dialog_set_button = 0x7f0b0021;
-		public static final int epub_title = 0x7f0b0017;
-		public static final int menu_bookmark = 0x7f0b0039;
-		public static final int menu_chapters = 0x7f0b0038;
-		public static final int menu_pick_epub = 0x7f0b0037;
+		public static final int bookmark_dialog_goto_button = 0x7f0b0019;
+		public static final int bookmark_dialog_set_button = 0x7f0b0018;
+		public static final int epub_title = 0x7f0b000e;
+		public static final int menu_bookmark = 0x7f0b0030;
+		public static final int menu_chapters = 0x7f0b002f;
+		public static final int menu_pick_epub = 0x7f0b002e;
 	}
 	public static final class layout {
 		public static final int activity_main = 0x7f030004;

@@ -41,6 +41,13 @@
     <string name="TxtFont">Font</string>
     <string name="TxtSize">Size</string>
     <string name="BackgroundColor">Color</string>
+	
+	<string name="tpbutton">Sort by Times Purchased</string>
+    <string name="tvbutton">Sort by Times Viewed</string>
+    <string name="sortcategories">Sorted by Categories</string>
+    <string name="sortviewed">Sorted by Times Viewed</string>
+    <string name="sortpurchased">Sorted by Times Purchased</string>
+    <string name="searchresults">Results:</string>
 
     
 

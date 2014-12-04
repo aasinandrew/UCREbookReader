@@ -1,131 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:id="@+id/searchlayout">
+
+
+    <Button
+        android:id="@+id/timespurchased_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/tpbutton" />
+
+    <Button
+        android:id="@+id/timesviewed_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/tvbutton" />
+    
+    <RelativeLayout
+        android:id="@+id/nah"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        
+        <TextView
+            android:id="@+id/nah2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sortviewed"
+            android:textSize="25sp" />
+        
+        <TextView
+            android:id="@+id/nah3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sortpurchased"
+            android:textSize="25sp" />
+        
+        <TextView
+            android:id="@+id/nah4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sortcategories"
+            android:textSize="25sp" />
+        
+        </RelativeLayout>
+
+
+    <ScrollView 
     android:layout_width="fill_parent"
     android:layout_height="wrap_content" >
 
     <LinearLayout
 
+		android:id= "@+id/ll"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical" >
         
-        <TextView
-            android:id="@+id/txtgenrehorror"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/Horror"
-            android:textSize="25sp" />
-        
-        <TextView
-            android:id="@+id/hauntedway"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-        
-        <ImageButton
-            android:id="@+id/imageButton6"
-            android:layout_width="120dp"
-            android:layout_height="112dp"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"
-            android:src="@drawable/hauntedway" />
-
-        <TextView
-            android:id="@+id/txtgenreaction"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/Action"
-            android:textSize="25sp" />
-        
-        <TextView
-            android:id="@+id/flintlord"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-        
-        <ImageButton
-            android:id="@+id/imageButton5"
-            android:layout_width="wrap_content"
-            android:layout_height="143dp"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"
-            android:src="@drawable/flintlord" />
-        
-        <TextView
-            android:id="@+id/txtgenrefantasy"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="@string/Fantasy"
-            android:textSize="25sp" />
-        
-        <TextView
-            android:id="@+id/harrypotter"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-        
-        <ImageButton
-            android:id="@+id/imageButton1"
-            android:layout_width="116dp"
-            android:layout_height="141dp"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"
-            android:src="@drawable/hp1" />
-        
-        <TextView
-            android:id="@+id/storm"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-        
-        <ImageButton
-            android:id="@+id/imageButton2"
-            android:layout_width="116dp"
-            android:layout_height="160dp"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"
-            android:src="@drawable/let_the_storms_break" />
-
-        <TextView
-            android:id="@+id/txtgenreromance"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:text="@string/Romance"
-            android:textSize="25sp" />
-        
-        <TextView
-            android:id="@+id/reckless"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-        
-        <ImageButton
-            android:id="@+id/imageButton3"
-            android:layout_width="109dp"
-            android:layout_height="138dp"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"
-            android:src="@drawable/reckless_viscount" />
-
-        <TextView
-            android:id="@+id/txtgenrebiology"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/Biology"
-            android:textSize="25sp" />
-        
-        <TextView
-            android:id="@+id/global"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" />
-        
-        <ImageButton
-            android:id="@+id/imageButton4"
-            android:layout_width="wrap_content"
-            android:layout_height="135dp"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"
-            android:src="@drawable/globalforest" />
-        
-          </LinearLayout>
+        </LinearLayout>
 
 </ScrollView>
-        
- 
+
+</LinearLayout>
