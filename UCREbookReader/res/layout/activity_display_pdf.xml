@@ -28,6 +28,7 @@
 	    android:id="@+id/GoBtn"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
+	    android:textColor="@color/black"
 	    android:layout_alignParentRight="true"
 	    android:layout_alignParentTop="true"
 	    android:text="@string/go_button" />
@@ -36,6 +37,7 @@
 	    android:id="@+id/NumPage"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
+	    android:textColor="@color/black"
 	    android:layout_alignTop="@+id/webViewPdf"
 	    android:layout_toLeftOf="@+id/GoBtn"
 	    android:ems="3"

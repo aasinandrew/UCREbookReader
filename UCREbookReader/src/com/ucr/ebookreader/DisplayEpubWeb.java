@@ -1,14 +1,17 @@
 package com.ucr.ebookreader;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.dteviot.epubviewer.Bookmark;
 import com.dteviot.epubviewer.BookmarkDialog;
@@ -39,8 +42,9 @@ public class DisplayEpubWeb extends Activity implements IResourceSource{
     public final static int NAVY = 0xff000080;
     public final static int OLIVE = 0xff808000;
  
-	private EpubWebView EpubView;
+	private EpubWebView EpubView; 
 	
+	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
@@ -54,12 +58,19 @@ public class DisplayEpubWeb extends Activity implements IResourceSource{
 			fileName = intent.getStringExtra(Welcome.EXTRA_FILE);
 		}		
 		//if user not logged in get intent from
-		else {
-			Intent intent = getIntent();
+		else { 
+			Intent intent = getIntent();  
 			fileName = intent.getStringExtra(WelcomeAnon.EXTRA_FILE);
 		}
-		
-	    EpubView = new EpubWebView30(this); 
+		 
+	    EpubView = new EpubWebView30(this);  
+	    EpubView.getSettings().setJavaScriptEnabled(true);
+		if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN) 
+		{
+			EpubView.getSettings().setAllowFileAccess(true);
+			EpubView.getSettings().setAllowFileAccessFromFileURLs(true);
+			EpubView.getSettings().setAllowUniversalAccessFromFileURLs(true);
+		} 
 	    setContentView(EpubView);
 	    EpubView.setBook(fileName);
 	    EpubView.loadChapter(null);
@@ -123,52 +134,66 @@ public class DisplayEpubWeb extends Activity implements IResourceSource{
                     break;
                 case CHANGE_SIZE:
                 	item = data.getStringExtra(ListTextSize.TEXT_SIZE);
-                	EpubView.clearCache(false);
-     		        EpubView.loadUrl("javascript:(document.body.style.fontSize ='"+item+"'pt);");
+                	EpubView.TextSize = item;
+                	EpubView.loadUrl("javascript:(document.body.style.fontSize = '"+item+"px');");
                     break;
-                case CHANGE_FONT:
-                	item = data.getStringExtra(ListTextFont.TEXT_FONT);
-     		        String font = item;
-     	            Typeface f = Typeface.createFromAsset((DisplayEpubWeb.this).getAssets(), "fonts/"+font);
-     	            EpubView.clearCache(false);
-     	            EpubView.loadUrl("javascript:(document.body.style.font ='"+font+"');");
-                    break;
-                case CHANGE_BACKGROUND:
-                	item = data.getStringExtra(ListTextBackground.BACKGROUND_COLOR);
-                	EpubView.clearCache(false);
+                case CHANGE_FONT:  
+                	item = data.getStringExtra(ListEpubFont.TEXT_FONT); 
+     		       	String font = item;   
+     		       	EpubView.Font = item;
+     		       	EpubView.loadUrl("javascript:var newStyle = document.createElement('style');var text = document.createTextNode(\"*{font-family: '"+font+"' !important; url('"+font+".ttf') format('truetype');}\");newStyle.appendChild(text);document.head.appendChild(newStyle);document.body.style.fontFamily = '"+font+"';");
+                    break;  
+                case CHANGE_BACKGROUND: 
+                	item = data.getStringExtra(ListTextBackground.BACKGROUND_COLOR);  
                 	if(item.equals("black"))
                 	{
+                		
+                		EpubView.TextColor = "white";
+                		EpubView.BackgroundColor = item;
                 		EpubView.loadUrl("javascript:(document.body.style.color ='white');");
                 		EpubView.loadUrl("javascript:(document.body.style.backgroundColor ='"+item+"');");
-                	}
+                		
+                	} 
                 	else if(item.equals("darkgray"))
                 	{
+                		EpubView.TextColor = "white";
+                		EpubView.BackgroundColor = item;
                 		EpubView.loadUrl("javascript:(document.body.style.color ='white');");
                 		EpubView.loadUrl("javascript:(document.body.style.backgroundColor ='"+item+"');");
 
-                	}
+                	} 
                 	else if(item.equals("grey"))
     	            {
+                		EpubView.TextColor = "black";
+                		EpubView.BackgroundColor = item;
                 		EpubView.loadUrl("javascript:(document.body.style.color ='black');");
                 		EpubView.loadUrl("javascript:(document.body.style.backgroundColor ='"+item+"');");
     	            }
                 	else if(item.equals("white"))
     	            {
+                		EpubView.TextColor = "black";
+                		EpubView.BackgroundColor = item;
                 		EpubView.loadUrl("javascript:(document.body.style.color ='black');");
                 		EpubView.loadUrl("javascript:(document.body.style.backgroundColor ='"+item+"');");
     	            }
                 	else if(item.equals("maroon"))
     	            {
+                		EpubView.TextColor = "black";
+                		EpubView.BackgroundColor = item;
                 		EpubView.loadUrl("javascript:(document.body.style.color ='black');");
                 		EpubView.loadUrl("javascript:(document.body.style.backgroundColor ='"+item+"');");
     	            }
                 	else if(item.equals("navy"))
     	            {
+                		EpubView.TextColor = "white";
+                		EpubView.BackgroundColor = item;
                 		EpubView.loadUrl("javascript:(document.body.style.color ='white');");
                 		EpubView.loadUrl("javascript:(document.body.style.backgroundColor ='"+item+"');");
     	            }
                 	else if(item.equals("olive"))
     	            {
+                		EpubView.TextColor = "black";
+                		EpubView.BackgroundColor = item;
                 		EpubView.loadUrl("javascript:(document.body.style.color ='black');");
                 		EpubView.loadUrl("javascript:(document.body.style.backgroundColor ='"+item+"');");
     	            } 
@@ -242,7 +267,7 @@ public class DisplayEpubWeb extends Activity implements IResourceSource{
 	    
 	    void launchChangeFont()
 	    {
-	    	Intent changeFont = new Intent(this, ListTextFont.class);
+	    	Intent changeFont = new Intent(this, ListEpubFont.class);
 	        startActivityForResult(changeFont, CHANGE_FONT);
 	    }
 	    

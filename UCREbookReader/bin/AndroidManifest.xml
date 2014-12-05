@@ -33,10 +33,16 @@
         <activity android:name="WelcomeAnon"></activity>
         <activity android:name="SearchActivity"></activity>
         <activity android:name="BrowseActivity"></activity>
-        <activity android:name="DisplayPdf"></activity>
-        <activity android:name="DisplayEpubWeb"></activity>
+        <activity android:name="DisplayPdf"
+            android:screenOrientation="portrait"
+    		android:configChanges="keyboardHidden|orientation|screenSize"></activity>
+        <activity android:name="DisplayEpubWeb"
+            android:screenOrientation="portrait"
+    		android:configChanges="keyboardHidden|orientation|screenSize"></activity>
         <activity android:name="ListChaptersActivity"></activity>
-        <activity android:name="DisplayTxt"></activity>
+        <activity android:name="DisplayTxt"
+            android:screenOrientation="portrait"
+    		android:configChanges="keyboardHidden|orientation|screenSize"></activity>
         <activity android:name="PickedBook"></activity>
         <activity android:name="ScanActivity"></activity>
         <activity android:name="PaymentActivity"></activity>
@@ -44,6 +50,10 @@
         <activity android:name="ListTextSize"></activity>
         <activity android:name="ListTextFont"></activity>
         <activity android:name="ListTextBackground"></activity>
+        <activity android:name="ListEpubFont"></activity>
+        <activity android:name="SearchActivityAnon"></activity>
+        <activity android:name="BrowseActivityAnon"></activity>
+        <activity android:name="PickedBookAnon"></activity>
     </application>
 
 </manifest>

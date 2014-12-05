@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import com.dteviot.epubviewer.epub.Book;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Picture;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.Build;
 import android.speech.tts.TextToSpeech;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -16,11 +18,13 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 /*
  * Holds the logic for the App's 
  * special WebView handling
  */
+@SuppressLint("NewApi")
 public abstract class EpubWebView extends WebView {
     private final static float FLING_THRESHOLD_VELOCITY = 200;
 
@@ -73,6 +77,11 @@ public abstract class EpubWebView extends WebView {
      */
     private Rect mRawScreenDimensions;
     
+    public String TextColor = "black";
+    public String BackgroundColor = "white";
+    public String TextSize = "14";
+    public String Font = "Courier";
+    
     public EpubWebView(Context context) {
         this(context, null);
     }
@@ -81,6 +90,13 @@ public abstract class EpubWebView extends WebView {
         super(context, attrs);
         mGestureDetector = new GestureDetector(context, mGestureListener);
         WebSettings settings = getSettings();
+        settings.setJavaScriptEnabled(true);
+		if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN) 
+		{
+			settings.setAllowFileAccess(true);
+			settings.setAllowFileAccessFromFileURLs(true);
+			settings.setAllowUniversalAccessFromFileURLs(true);
+		} 
         settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         settings.setPluginState(WebSettings.PluginState.ON_DEMAND);
         settings.setBuiltInZoomControls(true);
@@ -124,18 +140,19 @@ public abstract class EpubWebView extends WebView {
         if (mBook != null) {
             // if no chapter resourceName supplied, default to first one.
             if (resourceUri == null) {
-                resourceUri = mBook.firstChapter();
+                resourceUri = mBook.firstChapter();  
             }
             if (resourceUri != null) {
                 mCurrentResourceUri = resourceUri;
                 // prevent cache, because WebSettings.LOAD_NO_CACHE doesn't always work.
-                clearCache(false);
+                clearCache(false); 
                 LoadUri(resourceUri);
             }
+              	
         }
     }
 
-    /*
+    /* 
      * @ return load contents of URI into WebView,
      *   implementation is android version dependent 
      */

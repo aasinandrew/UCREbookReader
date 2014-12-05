@@ -5,8 +5,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
+import com.parse.FindCallback;
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseImageView;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -15,6 +23,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Menu;
@@ -25,6 +34,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 @SuppressLint("NewApi")
@@ -44,6 +54,9 @@ public class WelcomeAnon extends Activity {
 
 		// Set the currentUser String into TextView
 		txtuser.setText("You are not logged in.");	
+		
+		createButtons();
+		
 	}
 	
 	@Override
@@ -66,9 +79,7 @@ public class WelcomeAnon extends Activity {
 	        	return true;
 	        case R.id.action_scan:
 	    		Intent intent = new Intent(WelcomeAnon.this, ScanActivity.class);
-	    		//intent.putExtra("lastintent", "welcome");
 	    		startActivity(intent);
-	            //Scan();
 	        	return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
@@ -76,7 +87,7 @@ public class WelcomeAnon extends Activity {
 	}
 	
 	public void openSearch() {
-		Intent intent = new Intent(WelcomeAnon.this, SearchActivity.class);
+		Intent intent = new Intent(WelcomeAnon.this, SearchActivityAnon.class);
 		intent.putExtra("lastintent", "welcomeanon");
 		startActivity(intent);
 		//finish();
@@ -88,98 +99,95 @@ public class WelcomeAnon extends Activity {
 		//finish();
 	}
 	
-	public void Scan() {
-	    //create a list view to display files
-	    ListView listview = new ListView(WelcomeAnon.this);  //(ListView) findViewById(R.id.listview);
-
-	    //create arrays to hold files and the names of the files
-	    final ArrayList<File> files = new ArrayList<File>();
-	    ArrayList<String> list = new ArrayList<String>();
-	    
-	    //if SD card is mounted search for files and add them to files array
-	    if(Environment.getExternalStorageState().equals(MEDIA_MOUNTED))
-	    {
-	    	File sd = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
-	    	files.addAll(searchForFiles(sd));
-	    }
-	    
-	    //transfer the names of the files to the list array
-	    for (int i = 0; i < files.size(); ++i) 
-	    {
-	      list.add(files.get(i).getName());
-	    }
-	    
-	    //set up an adapter so listview is clickable
-	    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
-	    listview.setAdapter(adapter);
-	    listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-	      @Override
-	      public void onItemClick(AdapterView<?> parent, final View view, int position, long id) 
-	      {
-	    	//get name of file that was clicked
-	        String item = (String) parent.getItemAtPosition(position);
-	        //files.get(position);
-	        
-	        if(item.endsWith(".pdf"))
-	        {
-	            Intent intent = new Intent(WelcomeAnon.this, DisplayPdf.class);
-	            String fileToRead = files.get(position).getAbsolutePath();
-	            intent.putExtra(EXTRA_FILE, fileToRead);
-	            startActivity(intent);
-	        }
-	        
-	        if(item.endsWith(".txt"))
-	        {
-		        Intent intent = new Intent(WelcomeAnon.this, DisplayTxt.class);
-	            String fileToRead = files.get(position).getAbsolutePath();
-	            intent.putExtra(EXTRA_FILE, fileToRead);
-	            startActivity(intent);
-	        }
-	        
-	        if(item.endsWith(".epub"))
-	        {
-		        Intent intent = new Intent(WelcomeAnon.this, DisplayEpubWeb.class);
-		        String fileToRead = files.get(position).getAbsolutePath();
-		        intent.putExtra(EXTRA_FILE, fileToRead);
-		        startActivity(intent);
-	        }
-	      }
-
-	    });
-	    setContentView(listview);
+public void createButtons() {
+		
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Books");
+		query.findInBackground(new FindCallback<ParseObject>() {
+			@Override
+			public void done(List<ParseObject> books, ParseException e) {
+				
+				ParseObject book;
+				ParseFile cover = null;
+				ParseImageView coverImage;
+				int lastButtonId = 0;
+				int rowId = 0;
+				int[] posXY = new int[2];
+				
+				DisplayMetrics displaymetrics = new DisplayMetrics();
+				getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+				int screenHight = displaymetrics.heightPixels;
+				int screenWidth = displaymetrics.widthPixels;
+				
+				if (e == null) {
+					int horizoncnt = 0;
+					
+					//iterate through list of books retrieved from server
+					for(int i = 0; i < books.size(); i++) {
+						//Get Image to load
+						book = books.get(i);
+						cover = book.getParseFile("cover");
+						final String bookObjId = book.getObjectId();
+						
+						//Create ImageView
+						coverImage = new ParseImageView(WelcomeAnon.this);
+						
+						//Set Cover Image
+						coverImage.setParseFile(cover);
+						coverImage.loadInBackground(new GetDataCallback() {
+						     public void done(byte[] data, ParseException e) {
+						     // The image is loaded and displayed     
+						     }
+						});
+						
+						//Make image clickable
+						coverImage.setOnClickListener(new OnClickListener() {
+							public void onClick(View v) {
+								Intent intent = new Intent(WelcomeAnon.this, PickedBookAnon.class);
+								intent.putExtra("passedId", bookObjId);
+								startActivity(intent);
+								finish();
+						    }
+						});
+						
+						//Set Layout Parameters
+						RelativeLayout rltemp = (RelativeLayout) findViewById(R.id.welcomeanonRlayout);
+						RelativeLayout.LayoutParams lptemp = new RelativeLayout.LayoutParams(200, 200);
+						
+						if(i == 0) {
+							lptemp.addRule(RelativeLayout.BELOW, R.id.txtuser);
+							rowId = 1000 + i;
+						}
+						else if(horizoncnt == 0) {
+							lptemp.addRule(RelativeLayout.BELOW, rowId);
+							lptemp.addRule(RelativeLayout.ALIGN_LEFT, rowId);
+							rowId = lastButtonId + 1;
+						}
+						else {
+							lptemp.addRule(RelativeLayout.RIGHT_OF, lastButtonId);
+							lptemp.addRule(RelativeLayout.ALIGN_TOP, lastButtonId);
+						}
+						lptemp.setMargins(0, 0, 20, 20);
+						horizoncnt++;
+						
+						//Add Parameters to button
+						coverImage.setLayoutParams(lptemp);
+						
+						//Set the Id (add 1000 to make it unique)
+						lastButtonId = 1000 + i;
+						coverImage.setId(lastButtonId);
+						
+						//check if our next image will be off screen and adjust
+						if((200 + 20)*(horizoncnt + 1) > screenWidth) horizoncnt = 0;
+						
+						//Add ImageView to Screen
+						rltemp.addView(coverImage);
+					}
+				} else {
+					// something went wrong
+				}
+			}
+		});
+		
 	}
 	
-	//search SD card for ebook files
-	public ArrayList<File> searchForFiles(File f) 
-	{
-		ArrayList<File> files = new ArrayList<File>();
-		
-	    if (f.isDirectory()) 
-	    {
-	        File[] dirs = f.listFiles();
-	        if(dirs !=null)
-	        {
-		        for (int i =0; i < dirs.length; ++i) 
-		        {
-		        	files.addAll(searchForFiles(dirs[i]));
-		        }
-	        }
-	        
-	    } 
-	    else 
-	    {
-	    	String[] ebookExt = new String[] {".pdf",".epub",".txt",".doc"};
-	    	for(String iter : ebookExt)
-	    	{
-	    		if(f.getName().toLowerCase(Locale.getDefault()).endsWith(iter))
-	    		{
-	    			files.add(f);
-	    		    return files;
-	    		}
-	    	}
-
-	    }
-	    return files;
-	}
 }

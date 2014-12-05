@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/searchanonlayout"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical" 
+    android:id="@+id/searchlayout">
 
     <EditText
         android:id="@+id/searchtext"
@@ -17,16 +17,35 @@
         android:id="@+id/search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/searchtext"
         android:text="@string/SearchBtn" />
 
     <Button
         android:id="@+id/browse"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/search"
         android:text="@string/BrowseBtn" />
+    
+    <TextView
+        android:id="@+id/yee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/searchresults"
+        android:textSize="25sp" />
 
-</RelativeLayout>
+
+    <ScrollView 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
+
+    <LinearLayout
+
+		android:id= "@+id/linlayout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+        
+        </LinearLayout>
+
+</ScrollView>
+
+</LinearLayout>

@@ -10,6 +10,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -27,6 +30,7 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 public class SearchActivity extends Activity 
 {
@@ -38,6 +42,7 @@ public class SearchActivity extends Activity
 	String title;
 	String author;
 	String genre;
+	int price;
 	
 	LinearLayout list_books;
 	
@@ -50,10 +55,10 @@ public class SearchActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		//Get the layout from the search.xml
-		setContentView(R.layout.search);
+		setContentView(R.layout.search); 
 		
 		Bundle extras = getIntent().getExtras();
-		if(extras != null){
+		if(extras != null){  
 			lastintent = extras.getString("lastintent");
 		}
 		
@@ -89,7 +94,7 @@ public class SearchActivity extends Activity
 				        		 title = books.get(i).getString("title");
 				        		 author = books.get(i).getString("author");
 				        		 genre = books.get(i).getString("genre");
-				        		 
+				        		 price = books.get(i).getInt("price");
 				        		 
 				        		 if ( title.toLowerCase().contains(search_text.toLowerCase())
 				     					|| author.toLowerCase().contains(search_text.toLowerCase())
@@ -125,7 +130,8 @@ public class SearchActivity extends Activity
 					     				Button buybook = new Button(SearchActivity.this);
 										buybook.setText("Title: " + title + "\n" +
 				        				 		 		"Author: " + author + "\n" +
-				        				 		 		"Genre: " + genre + "\n");
+				        				 		 		"Genre: " + genre + "\n" +
+				        				 		 		"Price: $"+ price);
 											
 											
 					     				buybook.setOnClickListener(new OnClickListener() {
@@ -173,12 +179,50 @@ public class SearchActivity extends Activity
 			{
 				Intent intent = new Intent(SearchActivity.this, BrowseActivity.class);
 				startActivity(intent);
-				finish();
+				//finish();
 			}
 		});	
 		
 	}
 	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu items for use in the action bar
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.searchmenu, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle presses on the action bar items
+	    switch (item.getItemId()) {
+	        case R.id.action_shop:
+	            Intent intent = new Intent(SearchActivity.this, Welcome.class);
+	            startActivity(intent);
+	            return true;
+	        case R.id.action_logout:
+	        	Logout();
+	        	return true;
+	        case R.id.action_scan:
+	    		Intent intent1 = new Intent(SearchActivity.this, ScanActivity.class);
+	    		startActivity(intent1);
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	}
+	
+	public void Logout() {
+		Toast.makeText(SearchActivity.this, "Successfully logged out", Toast.LENGTH_SHORT).show();
+		ParseUser.logOut();
+		Intent intent = new Intent(SearchActivity.this, WelcomeAnon.class);
+		startActivity(intent);
+		//finish();
+	}
+	
+	
+	/*
 	@Override  
 	public void onBackPressed() {
 	    super.onBackPressed(); 
@@ -193,4 +237,5 @@ public class SearchActivity extends Activity
 	    	finish();
 	    }
 	}
+	*/
 }

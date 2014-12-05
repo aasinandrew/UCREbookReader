@@ -1,6 +1,13 @@
 package com.ucr.ebookreader;
 
+import java.util.List;
+
 import com.dteviot.epubviewer.Bookmark;
+import com.parse.FindCallback;
+import com.parse.ParseAnonymousUtils;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import android.annotation.SuppressLint;
@@ -19,6 +26,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 @SuppressLint({ "NewApi", "SetJavaScriptEnabled", "SdCardPath" }) 
 public class DisplayPdf extends Activity {
@@ -38,6 +46,28 @@ public class DisplayPdf extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_display_pdf);
+		
+		/*
+		ParseQuery<ParseObject> lastpage = ParseQuery.getQuery("Bookmarks");
+		lastpage.whereEqualTo("title", fileName);
+		lastpage.whereEqualTo("user", ParseUser.getCurrentUser().getUsername());
+		lastpage.findInBackground(new FindCallback<ParseObject>() {
+		     public void done(List<ParseObject> objects, ParseException e) {
+		         if (e == null) {
+		             if (objects.isEmpty()) {
+       	   
+		             }
+		             else {
+		            	 	ParseObject p = objects.get(0);
+		            	    savePage = p.getInt("pagenumber");
+		            	 
+		             }
+		         } else {
+		             
+		         }
+		     }
+	   });
+	   */
 		
 		wv = (WebView) findViewById(R.id.webViewPdf);
 		ParseUser currentUser = ParseUser.getCurrentUser();
@@ -129,6 +159,47 @@ public class DisplayPdf extends Activity {
 	    	return true;
 		}
     }
+    
+    
+    @Override
+	public void onBackPressed() {
+    	if (ParseAnonymousUtils.isLinked(ParseUser.getCurrentUser())) {
+    		
+    	}
+    	else {
+    		ParseQuery<ParseObject> checkbookmark = ParseQuery.getQuery("Bookmarks");
+        	checkbookmark.whereEqualTo("title", fileName);
+        	checkbookmark.whereEqualTo("format", "pdf");
+        	checkbookmark.whereEqualTo("user", ParseUser.getCurrentUser().getUsername());
+        	checkbookmark.findInBackground(new FindCallback<ParseObject>() {
+    		     public void done(List<ParseObject> objects, ParseException e) {
+    		         if (e == null) {
+    		             if (objects.isEmpty()) {
+    		            	ParseObject bookmark = new ParseObject("Bookmarks");
+    		             	bookmark.put("title", fileName);
+    		             	bookmark.put("pagenumber", savePage);
+    		             	bookmark.put("format", "pdf");
+    		             	bookmark.put("user", ParseUser.getCurrentUser().getUsername());
+    		             	bookmark.saveInBackground();	            	   
+    		             }
+    		             else {
+    		            	 ParseObject p = objects.get(0);		  
+    		            	 p.put("pagenumber", savePage);
+    		            	 p.saveInBackground();
+    		            	 
+    		            	 
+    		             }
+    		         } else {
+    		             
+    		         }
+    		     }
+    	   });
+    	}
+    	
+    		super.onBackPressed();
+     }
+     
+     
     
     /*
     @Override

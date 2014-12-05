@@ -1,5 +1,7 @@
 package com.dteviot.epubviewer;
 
+import java.io.InputStream;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.Uri;
@@ -9,6 +11,7 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 /*
  * EpubWebView for use with Android 3.0 and above
@@ -47,6 +50,16 @@ public class EpubWebView30 extends EpubWebView {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                view.loadUrl("javascript:(document.body.style.color ='"+TextColor+"');");
+                view.loadUrl("javascript:(document.body.style.backgroundColor ='"+BackgroundColor+"');");
+                view.loadUrl("javascript:(document.body.style.fontSize = '"+TextSize+"px');");
+                
+                //Font = "Tangerine";
+                //view.loadUrl("javascript:{var fileref = document.createElement('link')		fileref.setAttribute(\"rel\", \"stylesheet\")	fileref.setAttribute(\"type\", \"text/css\")	fileref.setAttribute(\"href\", \"http://fonts.googleapis.com/css?family="+Font+"\")		document.head.appendChild(filref)}");
+                //view.loadUrl("javascript:var newStyle = document.createElement('style');var text = document.createTextNode(\"*{font-family: '"+Font+"';}\");newStyle.appendChild(text);document.head.appendChild(newStyle);");
+                
+                view.loadUrl("javascript:var newStyle = document.createElement('style');var text = document.createTextNode(\"*{font-family: '"+Font+"' !important;src: url('"+Font+".ttf') format('truetype');}\");newStyle.appendChild(text);document.head.appendChild(newStyle);document.body.style.fontFamily = '"+Font+"';");
+                
                 onPageLoaded();
             }
         };        
@@ -69,7 +82,7 @@ public class EpubWebView30 extends EpubWebView {
         if (response == null) {
             getWebViewClient().onReceivedError(this, WebViewClient.ERROR_FILE_NOT_FOUND,
                     "Unable to find resource in epub", url);
-        } else {
+        } else {  	
             webResponse.setData(response.getData());
             webResponse.setMimeType(response.getMimeType());
         }

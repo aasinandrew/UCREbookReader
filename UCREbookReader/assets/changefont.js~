@@ -1,0 +1,9 @@
+var newStyle = document.createElement('style');
+newStyle.appendChild(document.createTextNode("\
+@font-face {\
+    font-family: '" + yourFontName + "';\
+    src: url('" + yourFontURL + "') format(yourFontFormat);\
+}\
+"));
+
+document.head.appendChild(newStyle);

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/action_scan" android:title="@string/action_search" android:icon="@drawable/ic_action_scan" android:showAsAction="ifRoom"></item>
+    <item android:id="@+id/action_shop" android:title="@string/action_shop" android:icon="@drawable/ic_action_shop" android:showAsAction="ifRoom"></item>
+    <item android:id="@+id/action_login" android:title="@string/action_login" android:showAsAction="ifRoom" android:icon="@drawable/ic_action_login"></item>
+    
+
+</menu>

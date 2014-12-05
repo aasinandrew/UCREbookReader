@@ -9,6 +9,9 @@ import android.app.ActionBar.LayoutParams;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -25,6 +28,7 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
 public class BrowseActivity extends Activity 
 {
@@ -32,6 +36,7 @@ public class BrowseActivity extends Activity
 	String title;
 	String author;
 	String genre;
+	int price;
 	int times_purchased;
 	int times_viewed;
 	
@@ -100,6 +105,7 @@ public class BrowseActivity extends Activity
 								title = books.get(i).getString("title");
 								author = books.get(i).getString("author");
 								genre = books.get(i).getString("genre");
+								price = books.get(i).getInt("price");
 
 								book = books.get(i);
 								final String bookObjId = book.getObjectId();
@@ -107,7 +113,8 @@ public class BrowseActivity extends Activity
 								Button buybook = new Button(BrowseActivity.this);
 								buybook.setText("Title: " + title + "\n" +
 										"Author: " + author + "\n" +
-										"Genre: " + genre + "\n");
+										"Genre: " + genre + "\n" +
+										"Price: $" + price);
 
 
 								buybook.setOnClickListener(new OnClickListener() {
@@ -158,6 +165,7 @@ public class BrowseActivity extends Activity
 								title = books.get(i).getString("title");
 								author = books.get(i).getString("author");
 								genre = books.get(i).getString("genre");
+								price = books.get(i).getInt("price");
 								times_purchased = books.get(i).getInt("timesPurchased");
 							
 								book = books.get(i);
@@ -166,7 +174,8 @@ public class BrowseActivity extends Activity
 								Button buybook = new Button(BrowseActivity.this);
 								buybook.setText("Title: " + title + "\n" +
 					        					"Author: " + author + "\n" +
-					        					"Genre: " + genre + "\n");
+					        					"Genre: " + genre + "\n" +
+					        					"Price: $" + price);
 						
 								buybook.setOnClickListener(new OnClickListener() 
 								{
@@ -231,6 +240,7 @@ public class BrowseActivity extends Activity
 								title = books.get(i).getString("title");
 								author = books.get(i).getString("author");
 								genre = books.get(i).getString("genre");
+								price = books.get(i).getInt("price");
 								times_viewed = books.get(i).getInt("timesViewed");
 						    
 								book = books.get(i);
@@ -239,7 +249,8 @@ public class BrowseActivity extends Activity
 								Button buybook = new Button(BrowseActivity.this);
 								buybook.setText("Title: " + title + "\n" +
 					        					"Author: " + author + "\n" +
-					        					"Genre: " + genre + "\n");
+					        					"Genre: " + genre + "\n" + 
+					        					"Price: $" + price);
 						
 								buybook.setOnClickListener(new OnClickListener() 
 								{
@@ -275,6 +286,46 @@ public class BrowseActivity extends Activity
 			}
 		});
 		
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu items for use in the action bar
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle presses on the action bar items
+	    switch (item.getItemId()) {
+	        case R.id.action_search:
+	        	Intent search = new Intent(BrowseActivity.this, SearchActivity.class);
+	            startActivity(search);
+	        	return true;
+	        case R.id.action_shop:
+	            Intent intent = new Intent(BrowseActivity.this, Welcome.class);
+	            startActivity(intent);
+	            return true;
+	        case R.id.action_logout:
+	        	Logout();
+	        	return true;
+	        case R.id.action_scan:
+	    		Intent intent1 = new Intent(BrowseActivity.this, ScanActivity.class);
+	    		startActivity(intent1);
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	}
+	
+	public void Logout() {
+		Toast.makeText(BrowseActivity.this, "Successfully logged out", Toast.LENGTH_SHORT).show();
+		ParseUser.logOut();
+		Intent intent = new Intent(BrowseActivity.this, WelcomeAnon.class);
+		startActivity(intent);
+		//finish();
 	}
 
 	

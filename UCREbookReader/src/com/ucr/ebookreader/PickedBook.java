@@ -4,12 +4,16 @@ import java.util.List;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseAnonymousUtils;
 import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseImageView;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -38,16 +42,18 @@ public class PickedBook extends Activity {
 	String genre;
 	String currUser = ParseUser.getCurrentUser().getUsername();
 	String currReview = "";
-	float masterRating;
+	double masterRating;
 	float currRating = -1;
 	int price;
+	ParseImageView coverImage;
 	TextView textField;
 	RatingBar rb;
 	ListView lv;
 	Button submitReview, buy, open, sample;
 	EditText rev;
 	Boolean loggedIn = false;
-	
+	ParseFile cover = null;
+	float userRating = 0;
 	
 	
 	
@@ -70,6 +76,7 @@ public class PickedBook extends Activity {
 			loggedIn = true;
 		}
 		
+		refreshRating();
 		
 		
 		ParseQuery<ParseObject> query = ParseQuery.getQuery("Books");
@@ -86,7 +93,21 @@ public class PickedBook extends Activity {
 					author = book.getString("author");
 					genre = book.getString("genre");
 					price = book.getInt("price");
-					masterRating = (float) book.getDouble("Rating");
+					cover = book.getParseFile("cover");
+					
+					//Set Cover Image
+					coverImage = (ParseImageView) findViewById(R.id.imageView1);
+					coverImage.setParseFile(cover);
+					coverImage.loadInBackground(new GetDataCallback() {
+					     public void done(byte[] data, ParseException e) {
+					     // The image is loaded and displayed     
+					     }
+					});
+					
+					
+					
+					
+					
 					
 					//Set title
 					textField = (TextView) findViewById(R.id.textView1);
@@ -102,7 +123,7 @@ public class PickedBook extends Activity {
 					
 					//Set Price
 					textField = (TextView) findViewById(R.id.textView4);
-					textField.setText("Price: " + price);
+					textField.setText("Price: $" + price);
 					
 					//Set Master Rating
 					textField = (TextView) findViewById(R.id.textView5);
@@ -116,7 +137,8 @@ public class PickedBook extends Activity {
 						@Override
 						public void onRatingChanged(RatingBar ratingBar, final float barRating,
 								boolean fromUser) {
-							editRatingData(barRating);
+							userRating = barRating;
+							//editRatingData(barRating);
 						}
 					});
 					
@@ -143,7 +165,18 @@ public class PickedBook extends Activity {
 								            	 Toast.makeText(PickedBook.this, "Book not purchased!", Toast.LENGTH_SHORT).show();								            	   
 								             }
 								             else {
-								            	 sendReview();
+								            	 
+								            	 if(rev.getText().toString().matches(""))
+								            	 {
+								            		 Toast.makeText(PickedBook.this, "Please enter review", Toast.LENGTH_SHORT).show();
+								            	 }
+								            	 else if(userRating == 0) {
+								            		 Toast.makeText(PickedBook.this, "Please enter rating", Toast.LENGTH_SHORT).show();
+								            		 
+								            	 }
+								            	 else {
+								            		 sendReview();
+								            	 }
 								             }
 								         } else {
 								             
@@ -159,11 +192,6 @@ public class PickedBook extends Activity {
 					buy.setOnClickListener(new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-						   //check if user has purchased monthly subscription
-						   if(ParseUser.getCurrentUser().getBoolean("monthlySubscription")) {
-							   Toast.makeText(PickedBook.this, "Subscription already purchased!", Toast.LENGTH_SHORT).show();
-						   }
-						   else {
 						   //check if user has purchased book already
 						   ParseQuery<ParseObject> checkPurchase = ParseQuery.getQuery("PurchasedBooks");
 						   checkPurchase.whereEqualTo("bookid", bookId);
@@ -190,7 +218,6 @@ public class PickedBook extends Activity {
 						   
 			 
 						  }
-						}
 					});
 					
 					open = (Button) findViewById(R.id.button3);
@@ -348,8 +375,10 @@ public class PickedBook extends Activity {
 	public void Logout() {
 		Toast.makeText(PickedBook.this, "Successfully logged out", Toast.LENGTH_SHORT).show();
 		ParseUser.logOut();
-		Intent intent = new Intent(PickedBook.this, WelcomeAnon.class);
+		Intent intent = new Intent(PickedBook.this, PickedBookAnon.class);
+		intent.putExtra("passedId", bookId);
 		startActivity(intent);
+		finish();
 	}
 	
 	
@@ -377,7 +406,7 @@ public class PickedBook extends Activity {
 						
 						userRating.put("username", currUser);
 						userRating.put("bookid", bookId);
-						userRating.put("review", rev.getText().toString());
+						userRating.put("rating", rating);
 						userRating.saveInBackground();
 					}
 				}
@@ -390,6 +419,39 @@ public class PickedBook extends Activity {
 			startActivity(intent);
 			finish();
 		}
+	}
+	
+	public void refreshRating() {
+		ParseQuery<ParseObject> getrating = ParseQuery.getQuery("UserRandR");
+		getrating.whereEqualTo("bookid", bookId);
+		getrating.findInBackground(new FindCallback<ParseObject>() {
+			@Override
+			public void done(List<ParseObject> objects, ParseException e) {
+				if(e == null)
+				{
+					ParseObject p;
+					double total = 0;
+					for(int i=0; i < objects.size(); i++)
+					{
+						p = objects.get(i);
+						total += p.getInt("rating");
+					}
+					total /= objects.size();
+					total = Math.round(total * 100.0);
+					total = total/100.0;
+					masterRating = total;
+					textField = (TextView) findViewById(R.id.textView5);
+					textField.setText("Rating: " + masterRating);
+				}
+				else {
+					
+				}
+				
+
+			}
+			
+		});
+		
 	}
 	
 	public void sendReview() {
@@ -411,20 +473,24 @@ public class PickedBook extends Activity {
 						userReview.put("username", currUser);
 						userReview.put("bookid", bookId);
 						userReview.put("review", rev.getText().toString());
+						userReview.put("rating", userRating);
 						userReview.saveInBackground();
 						Toast.makeText(getApplicationContext(), "Review sent", Toast.LENGTH_LONG).show();
 						rev.setText("");
 						populateReviews();
+						refreshRating();
 					} else {
 						ParseObject userReview = new ParseObject("UserRandR");
 						
 						userReview.put("username", currUser);
 						userReview.put("bookid", bookId);
 						userReview.put("review", rev.getText().toString());
+						userReview.put("rating", userRating);
 						userReview.saveInBackground();
 						Toast.makeText(getApplicationContext(), "Review sent", Toast.LENGTH_LONG).show();
 						rev.setText("");
 						populateReviews();
+						refreshRating();
 					}
 				}
 			});
@@ -485,5 +551,13 @@ public class PickedBook extends Activity {
 				lv.setAdapter(adapter);
 			}
 		});
+	}
+	
+	@SuppressLint("NewApi") @Override  
+	public void onBackPressed() {
+	    super.onBackPressed();   
+	    Intent intent = new Intent(PickedBook.this, Welcome.class);
+		startActivity(intent);
+		finish();
 	}
 }
