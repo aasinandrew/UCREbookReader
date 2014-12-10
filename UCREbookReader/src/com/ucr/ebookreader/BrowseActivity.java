@@ -2,6 +2,8 @@ package com.ucr.ebookreader;
 
 
 import java.util.ArrayList;
+import com.parse.GetDataCallback; 
+import com.parse.ParseImageView; 
 import java.util.Collections;
 import java.util.List;
 
@@ -99,36 +101,63 @@ public class BrowseActivity extends Activity
 						
 						for (int i = 0; i < books.size(); i++) 
 						{
+							title = books.get(i).getString("title");
+			        		author = books.get(i).getString("author");
+			        		genre = books.get(i).getString("genre");
+			        		price = books.get(i).getInt("price");
+			        		ParseFile cover = null;
+			 				ParseImageView coverImage;
+			 				 
 							if (books.get(i).getString("genre").toLowerCase()
 									.contains(categories[j].toLowerCase()))
 							{
-								title = books.get(i).getString("title");
-								author = books.get(i).getString("author");
-								genre = books.get(i).getString("genre");
-								price = books.get(i).getInt("price");
-
 								book = books.get(i);
-								final String bookObjId = book.getObjectId();
-
-								Button buybook = new Button(BrowseActivity.this);
-								buybook.setText("Title: " + title + "\n" +
-										"Author: " + author + "\n" +
-										"Genre: " + genre + "\n" +
-										"Price: $" + price);
-
-
-								buybook.setOnClickListener(new OnClickListener() {
+				        		cover = book.getParseFile("cover");
+			     				final String bookObjId = book.getObjectId();
+			     					
+			     				TextView book_details = new TextView(BrowseActivity.this);
+								book_details.setText("Title: " + title + "\n" +
+		        				 		 			"Author: " + author + "\n" +
+		        				 		 			"Genre: " + genre + "\n" +
+		        				 		 			"Price: $" + price);
+							
+								//Create ImageView
+								coverImage = new ParseImageView(BrowseActivity.this);
+								
+								//Set Cover Image
+								coverImage.setParseFile(cover);
+								coverImage.loadInBackground(new GetDataCallback() {
+								     public void done(byte[] data, ParseException e) {
+								     // The image is loaded and displayed     
+								     }
+								});
+								
+								//Make image clickable
+								coverImage.setOnClickListener(new OnClickListener() {
 									public void onClick(View v) {
 										Intent intent = new Intent(BrowseActivity.this, PickedBook.class);
 										intent.putExtra("passedId", bookObjId);
 										startActivity(intent);
-									}
+										finish();
+								    }
 								});
-
+									
+								//Set Layout Parameters
+								LinearLayout rinltemp = (LinearLayout) findViewById(R.id.ll);
+								LinearLayout.LayoutParams linptemp = new LinearLayout.LayoutParams(
+										LayoutParams.MATCH_PARENT,
+										LayoutParams.WRAP_CONTENT);
+								LinearLayout.LayoutParams covertemp = new LinearLayout.LayoutParams(200,200);
+							
 								//Add book to List of Results
-								buybook.setLayoutParams(lptemp);
-								buybook.setId(1000 + i);
-								rltemp.addView(buybook);
+								coverImage.setLayoutParams(covertemp);
+								coverImage.setId(1000 + i);
+								rinltemp.addView(coverImage);
+								
+								//Add Books details
+								book_details.setLayoutParams(linptemp);
+								book_details.setId(1000 + i);
+								rinltemp.addView(book_details);
 							}
 						}
 					}
@@ -167,24 +196,38 @@ public class BrowseActivity extends Activity
 								genre = books.get(i).getString("genre");
 								price = books.get(i).getInt("price");
 								times_purchased = books.get(i).getInt("timesPurchased");
+								ParseFile cover = null;
+				 				ParseImageView coverImage;
 							
-								book = books.get(i);
-								final String bookObjId = book.getObjectId();
-						     					
-								Button buybook = new Button(BrowseActivity.this);
-								buybook.setText("Title: " + title + "\n" +
-					        					"Author: " + author + "\n" +
-					        					"Genre: " + genre + "\n" +
-					        					"Price: $" + price);
-						
-								buybook.setOnClickListener(new OnClickListener() 
-								{
-									public void onClick(View v) 
-									{
+				 				book = books.get(i);
+				        		cover = book.getParseFile("cover");
+			     				final String bookObjId = book.getObjectId();
+			     					
+			     				TextView book_details = new TextView(BrowseActivity.this);
+								book_details.setText("Title: " + title + "\n" +
+		        				 		 			"Author: " + author + "\n" +
+		        				 		 			"Genre: " + genre + "\n" +
+		        				 		 			"Price: $" + price);
+							
+								//Create ImageView
+								coverImage = new ParseImageView(BrowseActivity.this);
+								
+								//Set Cover Image
+								coverImage.setParseFile(cover);
+								coverImage.loadInBackground(new GetDataCallback() {
+								     public void done(byte[] data, ParseException e) {
+								     // The image is loaded and displayed     
+								     }
+								});
+								
+								//Make image clickable
+								coverImage.setOnClickListener(new OnClickListener() {
+									public void onClick(View v) {
 										Intent intent = new Intent(BrowseActivity.this, PickedBook.class);
 										intent.putExtra("passedId", bookObjId);
 										startActivity(intent);
-									}
+										finish();
+								    }
 								});
 						    
 								//Set Layout Parameters
@@ -192,6 +235,7 @@ public class BrowseActivity extends Activity
 								LinearLayout.LayoutParams lptemp = new LinearLayout.LayoutParams(
 										LayoutParams.MATCH_PARENT,
 										LayoutParams.WRAP_CONTENT);
+								LinearLayout.LayoutParams covertemp = new LinearLayout.LayoutParams(200,200);
 								
 								//Add Times Purchased label
 								TextView tp_textview = new TextView(BrowseActivity.this);
@@ -201,9 +245,14 @@ public class BrowseActivity extends Activity
 								rltemp.addView(tp_textview);
 							
 								//Add book to List of Results
-								buybook.setLayoutParams(lptemp);
-								buybook.setId(1000 + i);
-								rltemp.addView(buybook);
+								coverImage.setLayoutParams(covertemp);
+								coverImage.setId(1000 + i);
+								rltemp.addView(coverImage);
+								
+								//Add Books details
+								book_details.setLayoutParams(lptemp);
+								book_details.setId(1000 + i);
+								rltemp.addView(book_details);
 							}	
 						}
 					}
@@ -242,24 +291,38 @@ public class BrowseActivity extends Activity
 								genre = books.get(i).getString("genre");
 								price = books.get(i).getInt("price");
 								times_viewed = books.get(i).getInt("timesViewed");
-						    
-								book = books.get(i);
-								final String bookObjId = book.getObjectId();
-						     					
-								Button buybook = new Button(BrowseActivity.this);
-								buybook.setText("Title: " + title + "\n" +
-					        					"Author: " + author + "\n" +
-					        					"Genre: " + genre + "\n" + 
-					        					"Price: $" + price);
-						
-								buybook.setOnClickListener(new OnClickListener() 
-								{
-									public void onClick(View v) 
-									{
+								ParseFile cover = null;
+				 				ParseImageView coverImage;
+							
+				 				book = books.get(i);
+				        		cover = book.getParseFile("cover");
+			     				final String bookObjId = book.getObjectId();
+			     					
+			     				TextView book_details = new TextView(BrowseActivity.this);
+								book_details.setText("Title: " + title + "\n" +
+		        				 		 			"Author: " + author + "\n" +
+		        				 		 			"Genre: " + genre + "\n" +
+		        				 		 			"Price: $" + price);
+							
+								//Create ImageView
+								coverImage = new ParseImageView(BrowseActivity.this);
+								
+								//Set Cover Image
+								coverImage.setParseFile(cover);
+								coverImage.loadInBackground(new GetDataCallback() {
+								     public void done(byte[] data, ParseException e) {
+								     // The image is loaded and displayed     
+								     }
+								});
+								
+								//Make image clickable
+								coverImage.setOnClickListener(new OnClickListener() {
+									public void onClick(View v) {
 										Intent intent = new Intent(BrowseActivity.this, PickedBook.class);
 										intent.putExtra("passedId", bookObjId);
 										startActivity(intent);
-									}
+										finish();
+								    }
 								});
 						    
 								//Set Layout Parameters
@@ -267,18 +330,24 @@ public class BrowseActivity extends Activity
 								LinearLayout.LayoutParams lptemp = new LinearLayout.LayoutParams(
 										LayoutParams.MATCH_PARENT,
 										LayoutParams.WRAP_CONTENT);
+								LinearLayout.LayoutParams covertemp = new LinearLayout.LayoutParams(200,200);
 								
-								//Add Times Viewed label
-								TextView tv_textview = new TextView(BrowseActivity.this);
-								tv_textview.setText("Times Viewed: " + times_viewed);
-								tv_textview.setLayoutParams(lptemp);
-								tv_textview.setId(1000 + i);
-								rltemp.addView(tv_textview);
+								//Add Times Purchased label
+								TextView tp_textview = new TextView(BrowseActivity.this);
+								tp_textview.setText("Times Viewed: " + times_viewed);
+								tp_textview.setLayoutParams(lptemp);
+								tp_textview.setId(1000 + i);
+								rltemp.addView(tp_textview);
 							
 								//Add book to List of Results
-								buybook.setLayoutParams(lptemp);
-								buybook.setId(1000 + i);
-								rltemp.addView(buybook);
+								coverImage.setLayoutParams(covertemp);
+								coverImage.setId(1000 + i);
+								rltemp.addView(coverImage);
+								
+								//Add Books details
+								book_details.setLayoutParams(lptemp);
+								book_details.setId(1000 + i);
+								rltemp.addView(book_details);
 							}	
 						}
 					}

@@ -1,5 +1,6 @@
 package com.ucr.ebookreader;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import com.parse.FindCallback;
@@ -76,8 +77,8 @@ public class PickedBook extends Activity {
 			loggedIn = true;
 		}
 		
-		refreshRating();
 		
+		refreshRating();
 		
 		ParseQuery<ParseObject> query = ParseQuery.getQuery("Books");
 		query.getInBackground(bookId, new GetCallback<ParseObject>() {
@@ -125,10 +126,7 @@ public class PickedBook extends Activity {
 					textField = (TextView) findViewById(R.id.textView4);
 					textField.setText("Price: $" + price);
 					
-					//Set Master Rating
-					textField = (TextView) findViewById(R.id.textView5);
-					textField.setText("Rating: " + masterRating);
-					
+
 					//Initialize Ratings Bar
 					rb = (RatingBar) findViewById(R.id.ratingBar1);
 					
@@ -437,11 +435,9 @@ public class PickedBook extends Activity {
 						total += p.getInt("rating");
 					}
 					total /= objects.size();
-					total = Math.round(total * 100.0);
-					total = total/100.0;
-					masterRating = total;
+					DecimalFormat df = new DecimalFormat("#.##");
 					textField = (TextView) findViewById(R.id.textView5);
-					textField.setText("Rating: " + masterRating);
+					textField.setText("Rating: " + df.format(total));
 				}
 				else {
 					

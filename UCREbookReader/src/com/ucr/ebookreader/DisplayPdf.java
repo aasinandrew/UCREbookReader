@@ -22,8 +22,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -47,27 +49,7 @@ public class DisplayPdf extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_display_pdf);
 		
-		/*
-		ParseQuery<ParseObject> lastpage = ParseQuery.getQuery("Bookmarks");
-		lastpage.whereEqualTo("title", fileName);
-		lastpage.whereEqualTo("user", ParseUser.getCurrentUser().getUsername());
-		lastpage.findInBackground(new FindCallback<ParseObject>() {
-		     public void done(List<ParseObject> objects, ParseException e) {
-		         if (e == null) {
-		             if (objects.isEmpty()) {
-       	   
-		             }
-		             else {
-		            	 	ParseObject p = objects.get(0);
-		            	    savePage = p.getInt("pagenumber");
-		            	 
-		             }
-		         } else {
-		             
-		         }
-		     }
-	   });
-	   */
+
 		
 		wv = (WebView) findViewById(R.id.webViewPdf);
 		ParseUser currentUser = ParseUser.getCurrentUser();
@@ -95,7 +77,41 @@ public class DisplayPdf extends Activity {
 		settings.setUseWideViewPort(true);
 		settings.setLoadWithOverviewMode(true);
 		settings.setBuiltInZoomControls(true);
-		wv.setWebChromeClient(new WebChromeClient());
+
+		wv.setWebViewClient(new WebViewClient() {
+
+			   public void onPageFinished(final WebView view, String url) {
+				   	super.onPageFinished(view, url);
+				   	
+				   	if (ParseAnonymousUtils.isLinked(ParseUser.getCurrentUser())) {
+			    		
+			    	}
+				   	else {
+					ParseQuery<ParseObject> lastpage = ParseQuery.getQuery("Bookmarks");
+					lastpage.whereEqualTo("title", fileName);
+					lastpage.whereEqualTo("user", ParseUser.getCurrentUser().getUsername());
+					lastpage.findInBackground(new FindCallback<ParseObject>() {
+					     public void done(List<ParseObject> objects, ParseException e) {
+					         if (e == null) {
+					             if (objects.isEmpty()) {
+					            	 savePage = 1;
+					            	 view.loadUrl("javascript:onGoToPage("+savePage+")");
+					             }
+					             else {
+					            	 	//Toast.makeText(this, "test", Toast.LENGTH_SHORT).show();
+					            	 	ParseObject p = objects.get(0);
+					            	    savePage = p.getInt("pagenumber");
+					            	    view.loadUrl("javascript:onGoToPage("+savePage+")");
+					             }
+					         } else {
+					             
+					         }
+					     }
+				   });
+				 
+			        }
+			   }
+		});
 		
 		if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.JELLY_BEAN) 
 		{
@@ -120,6 +136,31 @@ public class DisplayPdf extends Activity {
 			} 
 		});	
 		
+        if (ParseAnonymousUtils.isLinked(ParseUser.getCurrentUser())) {
+    		
+    	}
+        else {
+		ParseQuery<ParseObject> getbookmark = ParseQuery.getQuery("Bookmarks2");
+		getbookmark.whereEqualTo("title", fileName);
+		getbookmark.whereEqualTo("user", ParseUser.getCurrentUser().getUsername());
+		getbookmark.findInBackground(new FindCallback<ParseObject>() {
+		     public void done(List<ParseObject> objects, ParseException e) {
+		         if (e == null) {
+		             if (objects.isEmpty()) {
+		            	bookmark = 1;
+		            	 
+		             }
+		             else {
+		            	 	ParseObject p = objects.get(0);
+		            	    bookmark = p.getInt("bookmark");
+		            	  
+		             }
+		         } else {
+		             
+		         }
+		     }
+	   });
+      }
 	
 	}
 
@@ -139,20 +180,57 @@ public class DisplayPdf extends Activity {
 		        
 		case R.id.action_next:
 			wv.loadUrl("javascript:onNextPage()");
-			savePage++;
+			savePage++;			
 	    	return true;
 		
 		case R.id.action_previous:
 			wv.loadUrl("javascript:onPrevPage()");
 			savePage--;
+			if(savePage < 1)
+			{ 
+				savePage = 1;
+			}
 	    	return true;
 	    	
 		case R.id.action_goToBookmark:
+			savePage = bookmark;
 			wv.loadUrl("javascript:onGoToPage("+String.valueOf(bookmark)+")");
 	    	return true;
 	    	
 		case R.id.action_saveBookmark:
 			bookmark = savePage;
+			if (ParseAnonymousUtils.isLinked(ParseUser.getCurrentUser())) {
+	    		
+	    	}
+			else {
+			Toast.makeText(DisplayPdf.this, "Bookmark saved", Toast.LENGTH_SHORT).show();
+			ParseQuery<ParseObject> checkbookmark = ParseQuery.getQuery("Bookmarks2");
+        	checkbookmark.whereEqualTo("title", fileName);
+        	checkbookmark.whereEqualTo("user", ParseUser.getCurrentUser().getUsername());
+        	checkbookmark.findInBackground(new FindCallback<ParseObject>() {
+    		     public void done(List<ParseObject> objects, ParseException e) {
+    		         if (e == null) {
+    		             if (objects.isEmpty()) {
+    		            	ParseObject bookmark2 = new ParseObject("Bookmarks2");
+    		             	bookmark2.put("title", fileName);
+    		             	bookmark2.put("bookmark", bookmark);
+    		             	bookmark2.put("user", ParseUser.getCurrentUser().getUsername());
+    		             	bookmark2.saveInBackground();	            	   
+    		             }
+    		             else {
+    		            	 ParseObject p = objects.get(0);		  
+    		            	 p.put("bookmark", bookmark);
+    		            	 p.saveInBackground();
+    		            	 
+    		            	 
+    		             }
+    		         } else {
+    		             
+    		         }
+    		     }
+    		     
+    	   });
+		}
 	    	return true;
 
 		default:

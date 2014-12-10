@@ -1,5 +1,6 @@
 package com.ucr.ebookreader;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import com.parse.FindCallback;
@@ -120,9 +121,6 @@ public final static String EXTRA_FILE = "com.ucr.ebookreader.MESSAGE";
 					textField = (TextView) findViewById(R.id.textView4);
 					textField.setText("Price: $" + price);
 					
-					//Set Master Rating
-					textField = (TextView) findViewById(R.id.textView5);
-					textField.setText("Rating: " + masterRating);
 					
 					//Initialize Ratings Bar
 					//rb = (RatingBar) findViewById(R.id.ratingBar1);
@@ -384,11 +382,9 @@ public final static String EXTRA_FILE = "com.ucr.ebookreader.MESSAGE";
 						total += p.getInt("rating");
 					}
 					total /= objects.size();
-					total = Math.round(total * 100.0);
-					total = total/100.0;
-					masterRating = total;
+					DecimalFormat df = new DecimalFormat("#.##");
 					textField = (TextView) findViewById(R.id.textView5);
-					textField.setText("Rating: " + masterRating);
+					textField.setText("Rating: " + df.format(total));
 				}
 				else {
 					

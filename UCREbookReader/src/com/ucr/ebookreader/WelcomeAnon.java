@@ -101,93 +101,99 @@ public class WelcomeAnon extends Activity {
 	
 public void createButtons() {
 		
-		ParseQuery<ParseObject> query = ParseQuery.getQuery("Books");
-		query.findInBackground(new FindCallback<ParseObject>() {
-			@Override
-			public void done(List<ParseObject> books, ParseException e) {
+	ParseQuery<ParseObject> query = ParseQuery.getQuery("Books");
+	query.findInBackground(new FindCallback<ParseObject>() {
+		@Override
+		public void done(List<ParseObject> books, ParseException e) {
+			
+			ParseObject book;
+			ParseFile cover = null;
+			ParseImageView coverImage;
+			int lastButtonId = 0;
+			int rowId = 0;
+			
+			DisplayMetrics displaymetrics = new DisplayMetrics();
+			getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+			int screenHight = displaymetrics.heightPixels;
+			int screenWidth = displaymetrics.widthPixels;
+			
+			int booksize = screenWidth / 3;
+			int marginsize = booksize / 10;
+			booksize = booksize - (2 * marginsize);
+			
+			if (e == null) {
+				int horizoncnt = 0;
 				
-				ParseObject book;
-				ParseFile cover = null;
-				ParseImageView coverImage;
-				int lastButtonId = 0;
-				int rowId = 0;
-				int[] posXY = new int[2];
-				
-				DisplayMetrics displaymetrics = new DisplayMetrics();
-				getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-				int screenHight = displaymetrics.heightPixels;
-				int screenWidth = displaymetrics.widthPixels;
-				
-				if (e == null) {
-					int horizoncnt = 0;
+				//iterate through list of books retrieved from server
+				for(int i = 0; i < books.size(); i++) {
+					//Get Image to load 
+					book = books.get(i);
+					cover = book.getParseFile("cover");
+					final String bookObjId = book.getObjectId(); 
 					
-					//iterate through list of books retrieved from server
-					for(int i = 0; i < books.size(); i++) {
-						//Get Image to load
-						book = books.get(i);
-						cover = book.getParseFile("cover");
-						final String bookObjId = book.getObjectId();
-						
-						//Create ImageView
-						coverImage = new ParseImageView(WelcomeAnon.this);
-						
-						//Set Cover Image
-						coverImage.setParseFile(cover);
-						coverImage.loadInBackground(new GetDataCallback() {
-						     public void done(byte[] data, ParseException e) {
-						     // The image is loaded and displayed     
-						     }
-						});
-						
-						//Make image clickable
-						coverImage.setOnClickListener(new OnClickListener() {
-							public void onClick(View v) {
-								Intent intent = new Intent(WelcomeAnon.this, PickedBookAnon.class);
-								intent.putExtra("passedId", bookObjId);
-								startActivity(intent);
-								finish();
-						    }
-						});
-						
-						//Set Layout Parameters
-						RelativeLayout rltemp = (RelativeLayout) findViewById(R.id.welcomeanonRlayout);
-						RelativeLayout.LayoutParams lptemp = new RelativeLayout.LayoutParams(200, 200);
-						
-						if(i == 0) {
-							lptemp.addRule(RelativeLayout.BELOW, R.id.txtuser);
-							rowId = 1000 + i;
-						}
-						else if(horizoncnt == 0) {
-							lptemp.addRule(RelativeLayout.BELOW, rowId);
-							lptemp.addRule(RelativeLayout.ALIGN_LEFT, rowId);
-							rowId = lastButtonId + 1;
-						}
-						else {
-							lptemp.addRule(RelativeLayout.RIGHT_OF, lastButtonId);
-							lptemp.addRule(RelativeLayout.ALIGN_TOP, lastButtonId);
-						}
-						lptemp.setMargins(0, 0, 20, 20);
-						horizoncnt++;
-						
-						//Add Parameters to button
-						coverImage.setLayoutParams(lptemp);
-						
-						//Set the Id (add 1000 to make it unique)
-						lastButtonId = 1000 + i;
-						coverImage.setId(lastButtonId);
-						
-						//check if our next image will be off screen and adjust
-						if((200 + 20)*(horizoncnt + 1) > screenWidth) horizoncnt = 0;
-						
-						//Add ImageView to Screen
-						rltemp.addView(coverImage);
+					//Create ImageView
+					coverImage = new ParseImageView(WelcomeAnon.this);
+					
+					//Set Cover Image
+					coverImage.setParseFile(cover);
+					coverImage.loadInBackground(new GetDataCallback() {
+					     public void done(byte[] data, ParseException e) {
+					     // The image is loaded and displayed     
+					     }
+					});
+					
+					//Make image clickable
+					coverImage.setOnClickListener(new OnClickListener() {
+						public void onClick(View v) {
+							Intent intent = new Intent(WelcomeAnon.this, PickedBookAnon.class);
+							intent.putExtra("passedId", bookObjId);
+							startActivity(intent);
+							finish();
+					    }
+					});
+					
+					//Set Layout Parameters
+					RelativeLayout rltemp = (RelativeLayout) findViewById(R.id.welcomeanonRlayout);
+					RelativeLayout.LayoutParams lptemp = new RelativeLayout.LayoutParams(
+							booksize, booksize);
+					
+					if(i == 0) {
+						lptemp.addRule(RelativeLayout.BELOW, R.id.txtuser);
+						rowId = 1000 + i;
+						lptemp.setMargins(marginsize, marginsize, marginsize, marginsize);
 					}
-				} else {
-					// something went wrong
+					else if(horizoncnt == 0) {
+						lptemp.addRule(RelativeLayout.BELOW, rowId);
+						lptemp.addRule(RelativeLayout.ALIGN_LEFT, rowId);
+						rowId = lastButtonId + 1;
+						lptemp.setMargins(0, marginsize, marginsize, marginsize);
+					}
+					else {
+						lptemp.addRule(RelativeLayout.RIGHT_OF, lastButtonId);
+						lptemp.addRule(RelativeLayout.ALIGN_TOP, lastButtonId);
+						lptemp.setMargins(marginsize, 0, marginsize, marginsize);
+					}
+					horizoncnt++;
+					
+					//Add Parameters to button
+					coverImage.setLayoutParams(lptemp);
+					
+					//Set the Id (add 1000 to make it unique)
+					lastButtonId = 1000 + i;
+					coverImage.setId(lastButtonId);
+					
+					//check if our next image will be off screen and adjust
+					if((booksize + marginsize)*(horizoncnt + 1) > screenWidth) horizoncnt = 0;
+					
+					//Add ImageView to Screen
+					rltemp.addView(coverImage); 
 				}
+			} else {
+				// something went wrong
 			}
-		});
-		
-	}
+		}
+	});
+	
+}
 	
 }

@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.parse.FindCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseImageView;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -51,7 +54,7 @@ public class SearchActivityAnon extends Activity {
 	{
 		super.onCreate(savedInstanceState);
 		//Get the layout from the search.xml
-		setContentView(R.layout.searchanon);
+		setContentView(R.layout.search);
 		
 		Bundle extras = getIntent().getExtras();
 		if(extras != null){
@@ -91,50 +94,46 @@ public class SearchActivityAnon extends Activity {
 				        		 author = books.get(i).getString("author");
 				        		 genre = books.get(i).getString("genre");
 				        		 price = books.get(i).getInt("price");
+				        		 ParseFile cover = null;
+				 				 ParseImageView coverImage;
+				        		 
 				        		 
 				        		 if ( title.toLowerCase().contains(search_text.toLowerCase())
 				     					|| author.toLowerCase().contains(search_text.toLowerCase())
 				     					|| genre.toLowerCase().contains(search_text.toLowerCase()) ) {
 				     				
 				        			 
-										/*//obtaining Book covers
-						        		 ParseFile fileObject = (ParseFile) books.get(i).get("cover");
-						        		 fileObject.getDataInBackground(new GetDataCallback() 
-						        		 {
-														public void done(byte[] data, ParseException e) 
-														{
-															if (e == null) 
-															{
-																// Decode the Byte[] into
-																// Bitmap
-																Bitmap bmp = BitmapFactory.decodeByteArray(data, 0,
-																				data.length);
-																ImageView cov = new ImageView(SearchActivity.this);											cov.setImageBitmap(bmp);
-																cov.setMaxHeight(20);
-																cov.setMaxWidth(20);
-																cov.setId(1000 + i);
-																rltemp.addView(cov);
-																
-															}
-														}
-														
-						        		 });*/
-						        		 
 						        		book = books.get(i);
+						        		cover = book.getParseFile("cover");
 					     				final String bookObjId = book.getObjectId();
 					     					
-					     				Button buybook = new Button(SearchActivityAnon.this);
-										buybook.setText("Title: " + title + "\n" +
-				        				 		 		"Author: " + author + "\n" +
-				        				 		 		"Genre: " + genre + "\n" +
-				        				 		 		"Price: $" + price);
+					     				TextView book_details = new TextView(SearchActivityAnon.this);
+										book_details.setText("Title: " + title + "\n" +
+				        				 		 			"Author: " + author + "\n" +
+				        				 		 			"Genre: " + genre + "\n" +
+				        				 		 			"Price: $" + price);
+										
+										
 											
 											
-					     				buybook.setOnClickListener(new OnClickListener() {
+										//Create ImageView
+										coverImage = new ParseImageView(SearchActivityAnon.this);
+										
+										//Set Cover Image
+										coverImage.setParseFile(cover);
+										coverImage.loadInBackground(new GetDataCallback() {
+										     public void done(byte[] data, ParseException e) {
+										     // The image is loaded and displayed     
+										     }
+										});
+										
+										//Make image clickable
+										coverImage.setOnClickListener(new OnClickListener() {
 											public void onClick(View v) {
 												Intent intent = new Intent(SearchActivityAnon.this, PickedBookAnon.class);
 												intent.putExtra("passedId", bookObjId);
 												startActivity(intent);
+												finish();
 										    }
 										});
 											
@@ -143,11 +142,17 @@ public class SearchActivityAnon extends Activity {
 										LinearLayout.LayoutParams lptemp = new LinearLayout.LayoutParams(
 												LayoutParams.MATCH_PARENT,
 												LayoutParams.WRAP_CONTENT);
+										LinearLayout.LayoutParams covertemp = new LinearLayout.LayoutParams(200,200);
 									
 										//Add book to List of Results
-										buybook.setLayoutParams(lptemp);
-										buybook.setId(1000 + i);
-										rltemp.addView(buybook);
+										coverImage.setLayoutParams(covertemp);
+										coverImage.setId(1000 + i);
+										rltemp.addView(coverImage);
+										
+										//Add Books details
+										book_details.setLayoutParams(lptemp);
+										book_details.setId(1000 + i);
+										rltemp.addView(book_details);
 				                 }
 				        		 
 				        	 }
@@ -175,9 +180,9 @@ public class SearchActivityAnon extends Activity {
 			{
 				Intent intent = new Intent(SearchActivityAnon.this, BrowseActivityAnon.class);
 				startActivity(intent);
-				//finish();
+				finish();
 			}
-		});	
+		});		
 		
 	}
 	

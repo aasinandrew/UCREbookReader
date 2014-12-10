@@ -124,8 +124,8 @@ public class Welcome extends Activity {
 	
 
 	
-	//dynamically create buttons for books
-	public void createButtons() {
+	
+public void createButtons() {
 		
 		ParseQuery<ParseObject> query = ParseQuery.getQuery("Books");
 		query.findInBackground(new FindCallback<ParseObject>() {
@@ -137,22 +137,25 @@ public class Welcome extends Activity {
 				ParseImageView coverImage;
 				int lastButtonId = 0;
 				int rowId = 0;
-				int[] posXY = new int[2];
 				
 				DisplayMetrics displaymetrics = new DisplayMetrics();
 				getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
 				int screenHight = displaymetrics.heightPixels;
 				int screenWidth = displaymetrics.widthPixels;
 				
+				int booksize = screenWidth / 3;
+				int marginsize = booksize / 10;
+				booksize = booksize - (2 * marginsize);
+				
 				if (e == null) {
 					int horizoncnt = 0;
 					
 					//iterate through list of books retrieved from server
 					for(int i = 0; i < books.size(); i++) {
-						//Get Image to load
+						//Get Image to load 
 						book = books.get(i);
 						cover = book.getParseFile("cover");
-						final String bookObjId = book.getObjectId();
+						final String bookObjId = book.getObjectId(); 
 						
 						//Create ImageView
 						coverImage = new ParseImageView(Welcome.this);
@@ -177,22 +180,25 @@ public class Welcome extends Activity {
 						
 						//Set Layout Parameters
 						RelativeLayout rltemp = (RelativeLayout) findViewById(R.id.welcomeRLayout);
-						RelativeLayout.LayoutParams lptemp = new RelativeLayout.LayoutParams(200, 200);
+						RelativeLayout.LayoutParams lptemp = new RelativeLayout.LayoutParams(
+								booksize, booksize);
 						
 						if(i == 0) {
 							lptemp.addRule(RelativeLayout.BELOW, R.id.txtuser);
 							rowId = 1000 + i;
+							lptemp.setMargins(marginsize, marginsize, marginsize, marginsize);
 						}
 						else if(horizoncnt == 0) {
 							lptemp.addRule(RelativeLayout.BELOW, rowId);
 							lptemp.addRule(RelativeLayout.ALIGN_LEFT, rowId);
 							rowId = lastButtonId + 1;
+							lptemp.setMargins(0, marginsize, marginsize, marginsize);
 						}
 						else {
 							lptemp.addRule(RelativeLayout.RIGHT_OF, lastButtonId);
 							lptemp.addRule(RelativeLayout.ALIGN_TOP, lastButtonId);
+							lptemp.setMargins(marginsize, 0, marginsize, marginsize);
 						}
-						lptemp.setMargins(0, 0, 20, 20);
 						horizoncnt++;
 						
 						//Add Parameters to button
@@ -203,10 +209,10 @@ public class Welcome extends Activity {
 						coverImage.setId(lastButtonId);
 						
 						//check if our next image will be off screen and adjust
-						if((200 + 20)*(horizoncnt + 1) > screenWidth) horizoncnt = 0;
+						if((booksize + marginsize)*(horizoncnt + 1) > screenWidth) horizoncnt = 0;
 						
 						//Add ImageView to Screen
-						rltemp.addView(coverImage);
+						rltemp.addView(coverImage); 
 					}
 				} else {
 					// something went wrong
